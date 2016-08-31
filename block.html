@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <style>
+        .container {
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<button id="create">Создать блок</button>
+<button id="remember">Сохранить новое положение</button>
+<button id="delete" >удалить все куки</button>
+<div id="block"></div>
+<script>
+    function getRandomInt(min, max)
+    {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    let create = () => {
+            let newElem = document.createElement('div');
+        let bodyCont = document.getElementById('block');
+        bodyCont.appendChild(newElem);
+            newElem.setAttribute('class', 'container');
+            newElem.style.width = getRandomInt(20, window.innerWidth) + 'px';
+            newElem.style.height = getRandomInt(20, window.innerHeight) + 'px';
+            newElem.style.top = getRandomInt(20, window.innerHeight - parseInt(newElem.style.height,10)) + 'px';
+            newElem.style.left = getRandomInt(20, window.innerWidth- parseInt(newElem.style.width,10)) + 'px';
+            newElem.style.backgroundColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+            let activeElement;
+            let offsetX = 0;
+            let offsetY = 0;
+            let mDown = (e) => {
+                activeElement = e.target;
+                offsetX = e.offsetX;
+                offsetY = e.offsetY;
+            }
+            let mUp = (e) => {
+                activeElement = null;
+            }
+            let mMove = (e) =>
+            {
+                if (activeElement) {
+                    activeElement.style.top = (e.clientY - offsetY) + 'px';
+                    activeElement.style.left = (e.clientX - offsetX) + 'px';
+                }
+            }
+            newElem.addEventListener('mousedown', mDown);
+            newElem.addEventListener('mouseup', mUp);
+            document.addEventListener('mousemove', mMove);
+        let Block = document.getElementsByClassName('container'),
+                count = 0;
+        for (el in Block){
+            if (Block[count]){
+            Block[count].setAttribute('id','sq' + count);
+            }
+            count++;
+        }
+    };
+    let buttonCreate = document.getElementById('create');
+    let buttonRemember = document.getElementById('remember');
+    let buttonDraw = document.getElementById('draw');
+    let buttonDelete = document.getElementById('delete');
+    let rememberBlock = (item)=> {
+        let element = document.getElementById(item),
+                idEl = element.id,
+                classEl = element.className,
+                widthEl = element.style.width,
+                heightEl = element.style.height,
+                topEl = element.style.top,
+                leftEl = element.style.left,
+                backgroundEl = element.style.backgroundColor;
+        let expires = 1,
+                date = new Date;
+        date.setDate(date.getDate() + expires);
+        document.cookie = idEl + "=" + classEl + "=" + widthEl + "=" + heightEl + "=" + topEl + "=" + leftEl + "=" + backgroundEl +  "=" + ((expires) ? "=" + date.toUTCString() : "");
+    }
+    let createBlock = () => {
+        let cookies = document.cookie,
+                arr = cookies.split(';');
+                for (let count = 0; count < arr.length; count++) {
+                    cookie = arr[count].split('=');
+                    let newElem = document.createElement('div');
+                    let bodyCont = document.getElementById('block');
+                    bodyCont.appendChild(newElem);
+                    newElem.setAttribute('id', cookie[0]);
+                    newElem.setAttribute('class', cookie[1]);
+                    newElem.style.width = cookie[2];
+                    newElem.style.height = cookie[3];
+                    newElem.style.top = cookie[4];
+                    newElem.style.left = cookie[5];
+                    newElem.style.backgroundColor = cookie[6];
+                    let activeElement;
+                    let offsetX = 0;
+                    let offsetY = 0;
+                    let mDown = (e) => {
+                        activeElement = e.target;
+                        offsetX = e.offsetX;
+                        offsetY = e.offsetY;
+                    }
+                    let mUp = (e) => {
+                        activeElement = null;
+                    }
+                    let mMove = (e) =>
+                    {
+                        if (activeElement) {
+                            activeElement.style.top = (e.clientY - offsetY) + 'px';
+                            activeElement.style.left = (e.clientX - offsetX) + 'px';
+                        }
+                    }
+                    newElem.addEventListener('mousedown', mDown);
+                    newElem.addEventListener('mouseup', mUp);
+                    document.addEventListener('mousemove', mMove);
+                }
+    }
+    let cookieDelete = () => {
+        let cookies = document.cookie;
+        let cookie = cookies.split(';');
+        for (let i = 0; i < cookie.length; ++i){
+            var cook = cookie[i];
+            let date = new Date();
+            date.setTime(date.getTime() - 1);
+            document.cookie = cook.split('=')[0] += "=; expires=" + date.toGMTString();
+        }
+    }
+    let cleanMonitor = () => {
+        let bodyCont = document.getElementById('block');
+        bodyCont.remove();
+    }
+    buttonCreate.addEventListener('click',()=>{
+        create();
+        let conts = document.getElementsByClassName('container');
+        for (let count = 0; count < conts.length; count++){
+            rememberBlock(conts[count].id);
+        };
+    });
+    buttonRemember.addEventListener('click',()=>{
+        let conts = document.getElementsByClassName('container');
+        for (let count = 0; count < conts.length; count++){
+            rememberBlock(conts[count].id);
+        };
+    })
+    buttonDelete.addEventListener('click',()=>{
+        cookieDelete();
+        cleanMonitor();
+    });
+    createBlock();
+</script>
+</body>
+
+</html>
